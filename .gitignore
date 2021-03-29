@@ -1,0 +1,8 @@
+# Ignore everything
+*
+# But descend into directories
+!*/
+# Recursively allow files under src, bdna
+!/src/**
+!/bdna/**
+!.gitignore
