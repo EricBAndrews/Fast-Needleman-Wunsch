@@ -1,5 +1,5 @@
 CC = g++-6
-OPT = -O0
+OPT = -O3
 FLAGS = -Wall -std=c++11 $(OPT)
 OMP = -fopenmp
 

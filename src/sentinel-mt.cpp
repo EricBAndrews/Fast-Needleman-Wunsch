@@ -10,23 +10,20 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, int* t) {
   {
     long int a, b, c, m; // temps for max calculation
     
-    // populate table with INT_MIN
+    // // populate table with INT_MIN
     long int tnum = omp_get_thread_num();
     long int nThreads = omp_get_num_threads();
     long int blockSize = (nRows*nCols) / nThreads;
-    long int iMax = tnum == omp_get_num_threads() - 1 ?
-      blockSize + (nRows*nCols % blockSize) : blockSize;
+    long int iMax = tnum * blockSize + (
+      tnum == omp_get_num_threads() - 1 ?
+      blockSize + (nRows*nCols % blockSize) :
+      blockSize);
 
-    long int startIdx = tnum * blockSize;
-    t[startIdx] = INT_MIN;
-    a = 1;
-    while (a < iMax) {
-      memcpy(&t[startIdx+a], &t[startIdx],
-             (a+((((iMax-a)-a)>>SHIFTBITS)&((iMax-a)-a))) * sizeof(int));
-      a = a << 1;
-    }
+    std::fill(&t[blockSize*tnum], &t[iMax], INT_MIN);
 
 #pragma omp barrier
+
+    // printf("hi from %li\n", tnum);
 
     // populate first row
 #pragma omp single nowait
