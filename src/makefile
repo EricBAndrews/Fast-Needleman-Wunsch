@@ -1,6 +1,6 @@
 CC = g++-6
 OPT = -O3
-FLAGS = -Wall -std=c++11 $(OPT)
+FLAGS = -Wall -std=c++11 $(OPT) -g
 OMP = -fopenmp
 
 all: serial.e blocked-serial.e simple-mt.e sentinel-mt.e
@@ -20,8 +20,8 @@ sentinel-mt.e: sentinel-mt.cpp helper.o
 idxarray-mt.e: idxarray-mt.cpp helper.o
 	$(CC) $(FLAGS) $(OMP) -o idxarray-mt.e idxarray-mt.cpp helper.o
 
-idxarray2-mt.e: idxarray2-mt.cpp helper.o
-	$(CC) $(FLAGS) $(OMP) -o idxarray2-mt.e idxarray2-mt.cpp helper.o
+modIdxarray-mt.e: modIdxarray-mt.cpp helper.o
+	$(CC) $(FLAGS) $(OMP) -o modIdxarray-mt.e modIdxarray-mt.cpp helper.o
 
 helper.o: helper.cpp helper.hpp
 	$(CC) $(FLAGS) -c helper.cpp

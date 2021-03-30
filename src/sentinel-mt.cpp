@@ -8,7 +8,7 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, int* t) {
   
 #pragma omp parallel shared(t)
   {
-    long int a, b, c, m; // temps for max calculation
+    int a, b, c, m; // temps for max calculation
     
     // // populate table with INT_MIN
     long int tnum = omp_get_thread_num();
@@ -22,8 +22,6 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, int* t) {
     std::fill(&t[blockSize*tnum], &t[iMax], INT_MIN);
 
 #pragma omp barrier
-
-    // printf("hi from %li\n", tnum);
 
     // populate first row
 #pragma omp single nowait
@@ -65,7 +63,7 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, int* t) {
         
         a = a - (((a - b) >> SHIFTBITS) & (a - b));
         a = a - (((a - c) >> SHIFTBITS) & (a - c));
-        t[(i * (s1.size + 1)) + j] = a;
+        t[(i * nCols) + j] = a;
       }
     }
   }

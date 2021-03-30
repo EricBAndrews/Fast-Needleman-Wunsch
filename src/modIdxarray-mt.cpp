@@ -5,21 +5,27 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, int* t) {
   // convenience
   long int nRows = s2.size + 1;
   long int nCols = s1.size + 1;
-  long int* idxArray = new long int[16];
-  // long int idxArray[16]; // HARDCODED AND BAD
+  long int* idxArray;
+  long int idxArrayLen;
   
 #pragma omp parallel shared(t, idxArray)
-   {
-     long int tnum = omp_get_thread_num();
-     long int a, b, c, m; // temps for max calculation
-     long int nThreads = omp_get_num_threads();
+  {     
+    long int tnum = omp_get_thread_num();
+    int a, b, c, m; // temps for max calculation
+    long int nThreads = omp_get_num_threads();
+    
+#pragma omp single
+    {
+      idxArrayLen = nThreads * 2;
+      idxArray = new long int[idxArrayLen];
+    }
 
-     // populate idxArray with 0s
+    // populate idxArray with 0s
 #pragma omp single nowait
-     {
-       memset(idxArray, 0, 16 * sizeof(long int));
-       idxArray[0] = nCols;
-     }
+    {
+      memset(idxArray, 0, idxArrayLen * sizeof(long int));
+      idxArray[0] = nCols;
+    }
 
     // populate first row
 #pragma omp single nowait
@@ -38,27 +44,27 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, int* t) {
     }
     
 #pragma omp barrier
-
-    long int* depLocation; // above dependency
-
-    // TODO: why no work?
+    
+    long int depIdx;
+    long int modIdx;
+    long int* depLocation;
+    
     // populate remaining table, one thread per row
     for (long int i = tnum + 1; i < nRows; i += nThreads) {
-      printf("%li\n", i);
-      long int& j = idxArray[i%16];
-      depLocation = &idxArray[(i+15)%16];
-      for (j = 1; j < nCols; ++j) {
-        while (j > *depLocation) { }
+      modIdx = i % (nThreads*2);
+      depIdx = (i + (idxArrayLen - 1)) % (idxArrayLen);
+      depLocation = &idxArray[depIdx];
+      for (long int j = 1; j < nCols; ++j) {
+        // while (j > idxArray[depIdx]){ }
         // loops while above j less than previous thread's j
         // assembly so compiler doesn't "help" by removing "redundant" checks
-        // asm volatile ("loop:"
-        //               "movq (%[depLoc]), %%rax\n\t"
-        //               "cmpq %[j], %%rax\n\t"
-        //               "jle loop\n\t"
-        //               : // no output
-        //               : [depLoc]"r"(depLocation), [j]"r"(j)
-        //               : "rax", "memory");
-        
+        asm volatile ("loop:"
+                      "movq (%[depLoc]), %%rax\n\t"
+                      "cmpq %[j], %%rax\n\t"
+                      "jl loop\n\t"
+                      : // no output
+                      : [depLoc]"r"(depLocation), [j]"r"(j)
+                      : "rax", "memory");
         m = -(s1.dna[j-1] == s2.dna[i-1]);
         a = t[((i-1) * nCols) + j-1] + ((m & MATCH) | (~m & MISMATCH));
         b = t[((i-1) * nCols) + j] + GAP;
@@ -66,10 +72,11 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, int* t) {
         
         a = a - (((a - b) >> SHIFTBITS) & (a - b));
         a = a - (((a - c) >> SHIFTBITS) & (a - c));
-        t[(i * (s1.size + 1)) + j] = a;
-
-        // idxArray[i] = j;
+        t[(i * nCols) + j] = a;
+        
+        idxArray[modIdx] = j;
       }
+      idxArray[depIdx] = 0; // above dependency done, reset
     }
   }
   return;
