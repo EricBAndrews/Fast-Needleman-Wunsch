@@ -20,6 +20,9 @@ sentinel-mt.e: sentinel-mt.cpp helper.o
 idxarray-mt.e: idxarray-mt.cpp helper.o
 	$(CC) $(FLAGS) $(OMP) -o idxarray-mt.e idxarray-mt.cpp helper.o
 
+idxarray2-mt.e: idxarray2-mt.cpp helper.o
+	$(CC) $(FLAGS) $(OMP) -o idxarray2-mt.e idxarray2-mt.cpp helper.o
+
 modIdxarray-mt.e: modIdxarray-mt.cpp helper.o
 	$(CC) $(FLAGS) $(OMP) -o modIdxarray-mt.e modIdxarray-mt.cpp helper.o
 
