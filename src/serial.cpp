@@ -12,30 +12,14 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, int* t) {
   t[0] = 0;
   
 
-  // OPTIMIZATION: single loop to populate; reduce branching
-  if (nCols < nRows) {
-    for (long int i = 1; i < nCols; ++i) {
-      t[i] = t[i-1] + GAP;
-      t[i * nCols] = t[(i-1) * nCols] + GAP;
-    }
-    for (long int i = nCols; i < nRows; ++i) {
-      t[i * nCols] = t[(i-1) * nCols] + GAP;
-    }
-  }
-  else {
-    for (long int i = 1; i < nRows; ++i) {
-      t[i] = t[i-1] + GAP;
-      t[i * nCols] = t[(i-1) * nCols] + GAP;
-    }
-    for (long int i = nRows; i < nCols; ++i) {
-      t[i] = t[i-1] + GAP;
-    }
-  }
+  // populate first row and column
+  for (long int i = 1; i < nCols; ++i) { t[i] = t[i-1] + GAP; }
+  for (long int i = 1; i < nRows; ++i) { t[nCols*i] = t[nCols*(i-1)] + GAP; }
   
   
   // populate remaining table, row-major order
-b  for (long int i = 1; i < nRows; ++i) {
-    for (long int j = 1; j < nCols + 1; ++j) {
+  for (long int i = 1; i < nRows; ++i) {
+    for (long int j = 1; j < nCols; ++j) {
       m = -(s1.dna[j-1] == s2.dna[i-1]);
       a = t[((i-1) * nCols) + j-1] + ((m & MATCH) | (~m & MISMATCH));
       b = t[((i-1) * nCols) + j] + GAP;
@@ -44,9 +28,10 @@ b  for (long int i = 1; i < nRows; ++i) {
       // OPTIMIZATION: bitwise max 
       a = a - (((a - b) >> SHIFTBITS) & (a - b));
       a = a - (((a - c) >> SHIFTBITS) & (a - c));
-      t[(i * (s1.size + 1)) + j] = a;
+      t[(i * nCols) + j] = a;
     }
   }
+  
   return;
 }
 

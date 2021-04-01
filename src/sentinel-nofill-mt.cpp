@@ -5,8 +5,6 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, int* t) {
   // convenience
   long int nRows = s2.size + 1;
   long int nCols = s1.size + 1;
-
-  std::fill(&t[0], &t[nRows*nCols-1], INT_MIN);
   
 #pragma omp parallel shared(t)
   {
@@ -31,7 +29,9 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, int* t) {
       t[0] = 0;
       for (long int i = 1; i < nRows; ++i) {
         t[nCols*i] = t[nCols*(i-1)] + GAP;
+        t[nCols*i+1] = INT_MIN;
       }
+      // printTable(t, nRows, nCols);
     }
 
 #pragma omp barrier
@@ -40,6 +40,9 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, int* t) {
     // populate remaining table, one thread per row
     for (long int i = tnum + 1; i < nRows; i += nThreads) {
       for (long int j = 1; j < nCols; ++j) {
+        // set next spot to INT_MIN, unless at last spot in which case
+        // set the current spot to INT_MIN (redundant but no branching)
+        t[(i*nCols) + j + (((j + 1 - nCols) >> LONGBITS) & 1)] = INT_MIN;
         // loops while above spot is sentinel value
         // assembly so compiler doesn't "help" by removing "redundant" checks
         depLocation = &t[(i-1) * nCols + j];

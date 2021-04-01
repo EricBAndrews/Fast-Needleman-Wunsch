@@ -6,7 +6,7 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, int* t) {
   long int nRows = s2.size + 1;
   long int nCols = s1.size + 1;
 
-  std::fill(&t[0], &t[nRows*nCols-1], INT_MIN);
+  // std::fill(m, &m[n*n-1], INT_MIN);
   
 #pragma omp parallel shared(t)
   {
@@ -15,6 +15,13 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, int* t) {
     // // populate table with INT_MIN
     long int tnum = omp_get_thread_num();
     long int nThreads = omp_get_num_threads();
+    // long int blockSize = (nRows*nCols) / nThreads;
+    // long int iMax = tnum * blockSize + (
+    //   tnum == omp_get_num_threads() - 1 ?
+    //   blockSize + (nRows*nCols % blockSize) :
+    //   blockSize);
+
+    // std::fill(&t[blockSize*tnum], &t[iMax], INT_MIN);
 
 #pragma omp barrier
 
@@ -31,6 +38,7 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, int* t) {
       t[0] = 0;
       for (long int i = 1; i < nRows; ++i) {
         t[nCols*i] = t[nCols*(i-1)] + GAP;
+        t[nCols*i+1] = INT_MIN;
       }
     }
 
@@ -39,6 +47,7 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, int* t) {
     
     // populate remaining table, one thread per row
     for (long int i = tnum + 1; i < nRows; i += nThreads) {
+      std::fill(&t[nCols*i+2], &t[nCols*(i+1)-1], INT_MIN);
       for (long int j = 1; j < nCols; ++j) {
         // loops while above spot is sentinel value
         // assembly so compiler doesn't "help" by removing "redundant" checks

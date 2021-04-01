@@ -1,9 +1,9 @@
 CC = g++-6
 OPT = -O3
-FLAGS = -Wall -std=c++11 $(OPT) -g
+FLAGS = -Wall -std=c++11 $(OPT)
 OMP = -fopenmp
 
-all: serial.e blocked-serial.e simple-mt.e sentinel-mt.e
+all: serial.e blocked-serial.e simple-mt.e sentinel-mt.e sentinel-parfill-mt.e sentinel-otf-mt.e sentinel-nofill-mt.e idxarray-mt.e idxarray-emb-mt.e idxarray-mod-mt.e
 
 serial.e: serial.cpp helper.o
 	$(CC) $(FLAGS) -o serial.e serial.cpp helper.o
@@ -17,14 +17,23 @@ simple-mt.e: simple-mt.cpp helper.o
 sentinel-mt.e: sentinel-mt.cpp helper.o
 	$(CC) $(FLAGS) $(OMP) -o sentinel-mt.e sentinel-mt.cpp helper.o
 
+sentinel-parfill-mt.e: sentinel-parfill-mt.cpp helper.o
+	$(CC) $(FLAGS) $(OMP) -o sentinel-parfill-mt.e sentinel-parfill-mt.cpp helper.o
+
+sentinel-otf-mt.e: sentinel-otf-mt.cpp helper.o
+	$(CC) $(FLAGS) $(OMP) -o sentinel-otf-mt.e sentinel-otf-mt.cpp helper.o
+
+sentinel-nofill-mt.e: sentinel-nofill-mt.cpp helper.o
+	$(CC) $(FLAGS) $(OMP) -o sentinel-nofill-mt.e sentinel-nofill-mt.cpp helper.o
+
 idxarray-mt.e: idxarray-mt.cpp helper.o
 	$(CC) $(FLAGS) $(OMP) -o idxarray-mt.e idxarray-mt.cpp helper.o
 
-idxarray2-mt.e: idxarray2-mt.cpp helper.o
-	$(CC) $(FLAGS) $(OMP) -o idxarray2-mt.e idxarray2-mt.cpp helper.o
+idxarray-emb-mt.e: idxarray-emb-mt.cpp helper.o
+	$(CC) $(FLAGS) $(OMP) -o idxarray-emb-mt.e idxarray-emb-mt.cpp helper.o
 
-modIdxarray-mt.e: modIdxarray-mt.cpp helper.o
-	$(CC) $(FLAGS) $(OMP) -o modIdxarray-mt.e modIdxarray-mt.cpp helper.o
+idxarray-mod-mt.e: idxarray-mod-mt.cpp helper.o
+	$(CC) $(FLAGS) $(OMP) -o idxarray-mod-mt.e idxarray-mod-mt.cpp helper.o
 
 helper.o: helper.cpp helper.hpp
 	$(CC) $(FLAGS) -c helper.cpp
