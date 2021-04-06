@@ -22,23 +22,24 @@ int main(int argc, char** argv){
   int* table = new int[size];
 
   // run, time
-  clock_t cpuStart, cpuDiff;
+  // clock_t cpuStart, cpuDiff;
   auto wallStart = std::chrono::system_clock::now();
-  cpuStart = clock();
+  // cpuStart = clock();
   
   needlemanWunsch(s1, s2, table);
   
-  cpuDiff = clock() - cpuStart;
+  // cpuDiff = clock() - cpuStart;
   auto wallDiff = std::chrono::system_clock::now() - wallStart;
 
   
-  int cpuMsec = cpuDiff * 1000 / CLOCKS_PER_SEC;
-  std::cout << "CPU:  " << cpuMsec << "ms" << std::endl;
+  // int cpuMsec = cpuDiff * 1000 / CLOCKS_PER_SEC;
+  // std::cout << "CPU:  " << cpuMsec << "ms" << std::endl;
 
   int wallMsec = std::chrono::duration_cast<std::chrono::milliseconds>(wallDiff).count();
-  std::cout << "Wall: " << wallMsec << "ms" << std::endl;
+  std::cout << wallMsec;
+  // std::cout << "Wall: " << wallMsec << "ms" << std::endl;
 
-  std::cout << "Score: " << table[size-1] << std::endl;
+  // std::cout << "Score: " << table[size-1] << std::endl;
 
   free(table);
   
