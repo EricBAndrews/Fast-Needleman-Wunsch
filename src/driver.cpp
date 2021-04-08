@@ -19,9 +19,12 @@ int main(int argc, char** argv){
   // printSequence(s1);
   // printSequence(s2);
   
-  unsigned long long int size = (unsigned long long)(s1.size + 1) * (unsigned long long)(s2.size + 1);
+  long int size = (long int)(s1.size + 1) * (long int)(s2.size + 1);
   // std::cout << size << std::endl;
+
+  // allocate table and touch every page to ensure pretty allocation
   int* table = new int[size];
+  for (long int i = 0; i < size; i += 1024) { table[i] = 0; }
 
   // run, time
   // clock_t cpuStart, cpuDiff;
@@ -41,7 +44,7 @@ int main(int argc, char** argv){
   std::cout << wallMsec;
   // std::cout << "Wall: " << wallMsec << "ms" << std::endl;
 
-  // std::cout << "Score: " << table[size-1] << std::endl;
+  // std::cout << "\nScore: " << table[size-1] << std::endl;
 
   free(table);
   

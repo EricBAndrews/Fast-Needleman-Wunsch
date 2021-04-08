@@ -1,7 +1,16 @@
 #!/bin/zsh
 
-# benchmarking standard
-let "nRuns = 5"
+# thorough
+# let "nRuns = 5"
+# let "minSize = 2"
+# let "maxSize = 16"
+# let "sizeStep = 2"
+# let "minThreads = 2"
+# let "maxThreads = 8"
+# let "threadStep = 2"
+
+# fast(er)
+let "nRuns = 3"
 let "minSize = 2"
 let "maxSize = 16"
 let "sizeStep = 2"
@@ -9,22 +18,19 @@ let "minThreads = 2"
 let "maxThreads = 8"
 let "threadStep = 2"
 
-# fast
+# testing
 # let "nRuns = 1"
 # let "minSize=2"
-# let "maxSize = 12"
+# let "maxSize = 8"
 # let "sizeStep = 2"
-# let "minThreads = 2"
+# let "minThreads = 4"
 # let "maxThreads = 8"
-# let "threadStep = 2"
+# let "threadStep = 4"
 
 if [ $# -eq 0 ]
 then
     echo WARNING! no filename supplied. using sentinel-mt.e
     prog="sentinel-mt.e"
-    # prog="sentinel-parfill-mt.e"
-    # prog="sentinel-otf-mt.e"
-    # prog="sentinel-nofill-mt.e"
 else
     if [ -f $1 ]
     then
@@ -36,27 +42,27 @@ else
 fi
 
 
-# check results.tsv doesn't exist
-if [[ -f results.tsv ]]
+# check threads.tsv doesn't exist
+if [[ -f threads.tsv ]]
 then
-    echo WARNING! results.tsv already exists. please rename or remove.
+    echo WARNING! threads.tsv already exists. please rename or remove.
     exit
 fi
 
 # set up table
-echo benchmarks of $prog >> results.tsv 
-echo -n threads"\t" >> results.tsv
+echo benchmarks of $prog >> threads.tsv 
+echo -n threads"\t" >> threads.tsv
 
 for ((i = minSize; i <= maxSize; i+=$sizeStep))
 do
-    echo -n "$i"gb"\t" >> results.tsv
+    echo -n "$i"gb"\t" >> threads.tsv
 done
 
-echo >> results.tsv
+echo >> threads.tsv
 
 # benchmark serial
 
-echo -n serial"\t" >> results.tsv
+echo -n serial"\t" >> threads.tsv
 
 echo benchmarking serial...
 for ((i = minSize; i <= maxSize; i+=$sizeStep))
@@ -69,10 +75,10 @@ do
 	let "s = s + a"
     done
     let "s = s / $nRuns"
-    echo -n $s"\t" >> results.tsv
+    echo -n $s"\t" >> threads.tsv
 done
 
-echo >> results.tsv 
+echo >> threads.tsv 
 
 # benchmark parallel
 
@@ -80,7 +86,7 @@ for ((n = minThreads; n <= maxThreads; n+=$threadStep))
 do
     echo benchmarking $n threads...
     export OMP_NUM_THREADS=$n
-    echo -n $n"\t" >> results.tsv
+    echo -n $n"\t" >> threads.tsv
     for ((i = minSize; i <= maxSize; i+=$sizeStep))
     do
 	echo running on "$i"gb...
@@ -91,7 +97,7 @@ do
 	    let "s = s + a"
 	done
 	let "s = s / $nRuns"
-	echo -n $s"\t" >> results.tsv
+	echo -n $s"\t" >> threads.tsv
     done
-    echo >> results.tsv 
+    echo >> threads.tsv 
 done

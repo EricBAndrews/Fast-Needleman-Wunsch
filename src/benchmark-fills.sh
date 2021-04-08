@@ -11,21 +11,24 @@ progs=(serial.e
        sentinel-mt.e
        sentinel-parfill-mt.e
        sentinel-otf-mt.e
-       sentinel-nofill-mt.e)
+       sentinel-nofill-mt.e
+       sentinel-otf-blocked-mt.e)
 
 # number of threads to run each program on
 threads=(1 # serial
 	 8 # sentinel
 	 8 # parfill
 	 4 # otf
-	 4) # nofill
+	 4 # nofill
+	 4) # otf blocked
 
 # names for table
 tags=(serial
       naive
       parfill
       otf
-      nofill)
+      nofill
+      otf-blocked)
 
 let "numProgs = ${#progs[@]}"
 

@@ -12,17 +12,16 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, int* t) {
   {
     int a, b, c, m; // temps for max calculation
     
-    // // populate table with INT_MIN
     long int tnum = omp_get_thread_num();
     long int nThreads = omp_get_num_threads();
 
 #pragma omp barrier
 
     // populate first row
-#pragma omp single
+#pragma omp single nowait
     {
       t[0] = 0;
-      for (long int i = 1; i < nCols; ++i) { t[i] = t[i-1] + GAP; }
+      for (long int i = 1; i < nCols; ++i) { t[i] = i * GAP; }
     }
     
     // populate first column
@@ -30,7 +29,7 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, int* t) {
     {
       t[0] = 0;
       for (long int i = 1; i < nRows; ++i) {
-        t[nCols*i] = t[nCols*(i-1)] + GAP;
+        t[nCols*i] = i * GAP;
       }
     }
 
