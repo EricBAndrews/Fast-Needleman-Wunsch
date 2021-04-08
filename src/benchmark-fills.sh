@@ -2,7 +2,9 @@
 
 # benchmarking parameters
 let "nRuns = 5"
+let "minSize = 2"
 let "maxSize = 16"
+let "sizeStep = 2"
 
 # programs to benchmark
 progs=(serial.e
@@ -49,7 +51,7 @@ fi
 echo benchmarking fill techniques >> fill-techniques.tsv
 echo -n "program\t" >> fill-techniques.tsv
 
-for ((i = 1; i <= maxSize; i++))
+for ((i = minSize; i <= maxSize; i+=$sizeStep))
 do
     echo -n "$i"gb"\t" >> fill-techniques.tsv
 done
@@ -61,7 +63,7 @@ do
     echo benchmarking ${progs[$i]} "("${threads[$i]} threads, tagged ${tags[$i]}")"
     echo -n ${tags[$i]}"\t" >> fill-techniques.tsv
     export OMP_NUM_THREADS=${threads[$i]}
-    for ((j = 1; j <= maxSize; j++))
+    for ((j = minSize; j <= maxSize; j+=$sizeStep))
     do
 	echo running on "$j"gb...
 	let "s = 0"

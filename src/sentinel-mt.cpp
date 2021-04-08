@@ -19,7 +19,7 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, int* t) {
 #pragma omp barrier
 
     // populate first row
-#pragma omp single nowait
+#pragma omp single
     {
       t[0] = 0;
       for (long int i = 1; i < nCols; ++i) { t[i] = t[i-1] + GAP; }

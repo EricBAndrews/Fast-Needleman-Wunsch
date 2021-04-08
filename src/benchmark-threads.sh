@@ -1,8 +1,22 @@
 #!/bin/zsh
 
+# benchmarking standard
 let "nRuns = 5"
+let "minSize = 2"
 let "maxSize = 16"
+let "sizeStep = 2"
+let "minThreads = 2"
 let "maxThreads = 8"
+let "threadStep = 2"
+
+# fast
+# let "nRuns = 1"
+# let "minSize=2"
+# let "maxSize = 12"
+# let "sizeStep = 2"
+# let "minThreads = 2"
+# let "maxThreads = 8"
+# let "threadStep = 2"
 
 if [ $# -eq 0 ]
 then
@@ -33,7 +47,7 @@ fi
 echo benchmarks of $prog >> results.tsv 
 echo -n threads"\t" >> results.tsv
 
-for ((i = 1; i <= maxSize; i++))
+for ((i = minSize; i <= maxSize; i+=$sizeStep))
 do
     echo -n "$i"gb"\t" >> results.tsv
 done
@@ -45,7 +59,7 @@ echo >> results.tsv
 echo -n serial"\t" >> results.tsv
 
 echo benchmarking serial...
-for ((i = 1; i <= maxSize; i++))
+for ((i = minSize; i <= maxSize; i+=$sizeStep))
 do
     echo running on "$i"gb...
     let "s = 0"
@@ -62,19 +76,18 @@ echo >> results.tsv
 
 # benchmark parallel
 
-for ((n = 1; n <= maxThreads; ++n))
+for ((n = minThreads; n <= maxThreads; n+=$threadStep))
 do
     echo benchmarking $n threads...
     export OMP_NUM_THREADS=$n
     echo -n $n"\t" >> results.tsv
-    for ((i = 1; i <= maxSize; i++))
+    for ((i = minSize; i <= maxSize; i+=$sizeStep))
     do
 	echo running on "$i"gb...
 	let "s = 0"
 	for ((j = 0; j < nRuns; j++))
 	do
 	    let "a = $(./$prog bdna-link/"$i"gb-1.bdna bdna-link/"$i"gb-2.bdna)"
-	    echo $a
 	    let "s = s + a"
 	done
 	let "s = s / $nRuns"
