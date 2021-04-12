@@ -1,10 +1,18 @@
 #!/bin/zsh
 
 # benchmarking parameters
-let "nRuns = 5"
-let "minSize = 2"
+# thorough
+# let "nRuns = 5"
+# let "minSize = 2"
+# let "maxSize = 16"
+# let "sizeStep = 2"
+# let "threads = 4"
+
+# fast
+let "nRuns = 1"
+let "minSize = 4"
 let "maxSize = 16"
-let "sizeStep = 2"
+let "sizeStep = 4"
 let "threads = 4"
 
 if [ $# -eq 0 ]

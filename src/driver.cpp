@@ -24,29 +24,39 @@ int main(int argc, char** argv){
 
   // allocate table and touch every page to ensure pretty allocation
   int* table = new int[size];
-  for (long int i = 0; i < size; i += 1024) { table[i] = 0; }
+  // for (long int i = 0; i < size; i += 1024) { table[i] = 0; }
+
+
+  // TESTING
+  // allocate a second table and touch it to force first table out of RAM
+  /*
+  volatile int* table2 = new int[4000000000];
+  for (long int i = 0; i < 4000000000; i += 1025) {
+    table2[i] = 0;
+  }
+  */
 
   // run, time
-  // clock_t cpuStart, cpuDiff;
   auto wallStart = std::chrono::system_clock::now();
-  // cpuStart = clock();
   
   needlemanWunsch(s1, s2, table);
   
-  // cpuDiff = clock() - cpuStart;
   auto wallDiff = std::chrono::system_clock::now() - wallStart;
-
-  
-  // int cpuMsec = cpuDiff * 1000 / CLOCKS_PER_SEC;
-  // std::cout << "CPU:  " << cpuMsec << "ms" << std::endl;
 
   int wallMsec = std::chrono::duration_cast<std::chrono::milliseconds>(wallDiff).count();
   std::cout << wallMsec;
-  // std::cout << "Wall: " << wallMsec << "ms" << std::endl;
 
   // std::cout << "\nScore: " << table[size-1] << std::endl;
 
-  free(table);
+  delete table;
+
+  /*
+  if (table2[3999999999] == -1) {
+    delete table2;
+    return 1;
+  }
+  delete table2;
+  */
   
   return 0;
 }

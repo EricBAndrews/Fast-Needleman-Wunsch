@@ -1,10 +1,17 @@
 #!/bin/zsh
 
 # benchmarking parameters
-let "nRuns = 5"
-let "minSize = 2"
+# thorough
+# let "nRuns = 5"
+# let "minSize = 2"
+# let "maxSize = 16"
+# let "sizeStep = 2"
+
+# fast
+let "nRuns = 2"
+let "minSize = 4"
 let "maxSize = 16"
-let "sizeStep = 2"
+let "sizeStep = 4"
 
 # programs to benchmark
 progs=(serial.e
@@ -16,8 +23,8 @@ progs=(serial.e
 
 # number of threads to run each program on
 threads=(1 # serial
-	 8 # sentinel
-	 8 # parfill
+	 4 # sentinel
+	 4 # parfill
 	 4 # otf
 	 4 # nofill
 	 4) # otf blocked
