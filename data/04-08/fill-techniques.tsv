@@ -1,0 +1,8 @@
+benchmarking fill techniques
+program	4gb	8gb	12gb	16gb	
+serial	2061	4160	6291	14954	
+naive	1056	2188	3211	15093	
+parfill	1061	2121	3028	14266	
+otf	866	1587	2334	10275	
+nofill	869	1689	2698	10954	
+otf-blocked	620	1190	1874	9333	

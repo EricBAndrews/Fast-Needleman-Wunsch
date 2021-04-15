@@ -6,4 +6,11 @@
 # Recursively allow files under src, bdna
 !/src/**
 !/bdna/**
+!/data/**
 !.gitignore
+
+# Extensions, misc
+.DS_Store
+*.e
+*.o
+*.dSYM

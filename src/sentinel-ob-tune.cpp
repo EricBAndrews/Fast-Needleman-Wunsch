@@ -2,11 +2,10 @@
 
 // rows, columns per block
 // best for 4k blocks
-#define N 128
-#define M 64
+// N = 128, M = 64 seems to work well
 
 // takes in the array to be filled--don't care about the allocation time
-void needlemanWunsch(dnaArray s1, dnaArray s2, int* t) {
+void needlemanWunsch(dnaArray s1, dnaArray s2, int N, int M, int* t) {
   // convenience
   long int nRows = s2.size + 1;
   long int nCols = s1.size + 1;
@@ -91,4 +90,4 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, int* t) {
   return;
 }
 
-#include "driver.cpp"
+#include "block-tuner.cpp"

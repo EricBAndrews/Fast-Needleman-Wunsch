@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 import argparse
 
 parser = argparse.ArgumentParser(
@@ -18,6 +19,9 @@ parser.add_argument('-x',
 parser.add_argument('-y',
                     type=str,
                     help='y label')
+parser.add_argument('-z',
+                    type=str,
+                    help='z label')
 parser.add_argument('--speedup',
                     type=bool,
                     help='graph relative to serial')
@@ -26,7 +30,6 @@ args = parser.parse_args()
 
 # parameters
 title = args.t
-# dataFileName = datadir + '/' + dataFileNameShort + '.tsv'
 xLabel = args.x
 yLabel = args.y
 
@@ -34,25 +37,31 @@ yLabel = args.y
 fin = args.f
 print('parsing results from ' + fin.readline(), end='')
 xVals = fin.readline().split()[1:]
-xVals = [int(a[:-2]) for a in xVals]
+xVals = [int(a) for a in xVals]
 
-yVals = {}
+zMat = []
+
+yVals = []
 for line in fin:
-    splitLine = line.split()
-    yVals[splitLine[0]] = [int(a) for a in splitLine[1:]]
+    yVals.append(int(line.split()[0]))
+    zMat.append([int(a) for a in line.split()[1:]])
 
-# adjust to do speedup
-if (args.speedup):
-    for v in yVals:
-        if (v != 'serial'):
-            for i in range(len(yVals[v])):
-                yVals[v][i] = yVals['serial'][i] / yVals[v][i]
-    yVals['serial'] = [1 for i in yVals['serial']]
+def f(x, y):
+    return zMat[xVals.index(x)][yVals.index(y)]
 
-for v in yVals:
-    plt.plot(xVals, yVals[v], label=v)
 
-plt.legend()
+X, Y = np.meshgrid(xVals, yVals)
+Z = np.array(zMat)
+maxTime = max([max(a) for a in zMat])
+
+fig = plt.figure()
+ax = plt.axes(projection='3d')
+ax.plot_surface(X, Y, Z, cmap='viridis', linewidth=.2)
+ax.set_xlabel('x')
+ax.set_ylabel('y')
+ax.set_zlabel('z')
+ax.set_zlim([0, maxTime])
+
 plt.title(title)
 plt.xlabel(xLabel)
 plt.ylabel(yLabel)
