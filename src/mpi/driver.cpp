@@ -20,8 +20,7 @@ int main(int argc, char** argv){
 
   // allocate table and touch every page to ensure pretty allocation
   int* table = new int[size];
-  for (long int i = 0; i < size; i += 1024) { table[i] = 0; }
-  
+
   // run, time
   auto wallStart = std::chrono::system_clock::now();
   
@@ -32,9 +31,7 @@ int main(int argc, char** argv){
   int wallMsec = std::chrono::duration_cast<std::chrono::milliseconds>(wallDiff).count();
   std::cout << wallMsec;
 
-  std::cout << "\nScore: " << table[size-1] << std::endl;
-
   delete table;
-
+  
   return 0;
 }

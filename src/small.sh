@@ -10,5 +10,5 @@ if ! [[ -f "$1" ]]
 then
     echo "ERROR: could not compile $1. exiting."
 else
-    ./"$1" ../bdna/small1.bdna ../bdna/small2.bdna 
+    ./"$1" bdna-link/small1.bdna bdna-link/small2.bdna 
 fi

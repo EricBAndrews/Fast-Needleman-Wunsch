@@ -31,7 +31,8 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, int* t) {
       t[(i * nCols) + j] = a;
     }
   }
-  
+
+  // printTable(t, nRows, nCols);
   return;
 }
 
