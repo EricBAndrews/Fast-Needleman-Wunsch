@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
     MPI_Recv(&recEnd, nProc-1, MPI_LONG, nProc-1, nProc-1,
              MPI_COMM_WORLD, NULL);
     
-    printf("time: %lims\n", recEnd - first);
+    printf("time: %li\n", recEnd - first);
   }
 
   // send time info to rank 0

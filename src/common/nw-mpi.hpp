@@ -1,3 +1,6 @@
+#ifndef NW_MPI_H
+#define NW_MPI_H
+
 #include <mpi.h>
 #include <stdio.h>
 #include <string.h>
@@ -13,3 +16,5 @@
 #define LONGBITS 63
 
 #define COMMBUF_SIZE 64
+
+#endif

@@ -1,4 +1,4 @@
-#include "nw-mpi.hpp"
+#include "../common/nw-mpi.hpp"
 
 // takes in the array to be filled--don't care about the allocation time
 void needlemanWunsch(dnaArray s1, dnaArray s2, int nCols,
@@ -109,4 +109,4 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, int nCols,
   return;
 }
 
-#include "mpidriver.cpp"
+#include "../common/mpidriver.cpp"
