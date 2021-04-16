@@ -12,11 +12,6 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, int nCols,
   // buffers for sending, receiving
   int* sendBuf = new int[COMMBUF_SIZE];
   int* recvBuf = new int[COMMBUF_SIZE];
-  // int sendBuf[COMMBUF_SIZE];
-  // int recvBuf[COMMBUF_SIZE];
-  // MPI_Status sendStat;
-  MPI_Request send;
-  // MPI_Send_init()
 
   // first index of s1 in this table (last index of rank-1's work)
   long int start = ((s1.size + 1) / nProc) * rank - (rank > 0);
