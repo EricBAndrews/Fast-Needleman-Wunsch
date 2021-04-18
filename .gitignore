@@ -10,7 +10,7 @@
 !.gitignore
 
 # Extensions, misc
-.DS_Store
+*.DS_Store
 *.e
 *.o
 *.dSYM

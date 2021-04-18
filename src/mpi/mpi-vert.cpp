@@ -1,7 +1,7 @@
-#include "../common/nw-mpi.hpp"
+#include "nw-mpi.hpp"
 
 // takes in the array to be filled--don't care about the allocation time
-void needlemanWunsch(dnaArray s1, dnaArray s2, int nCols,
+void needlemanWunsch(dnaArray s1, dnaArray s2, long int nCols,
                      int rank, int nProc, int* t) {
   // note: s1 across top, s2 down side
   
@@ -17,7 +17,6 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, int nCols,
   long int start = ((s1.size + 1) / nProc) * rank - (rank > 0);
 
   // populate first row
-  for (long int i = 0; i < nCols; ++i) { t[i] = (i + start) * GAP; }
   for (long int i = 0; i < nCols; ++i) { t[i] = (i + start) * GAP; }
 
   // RANK 0
@@ -109,4 +108,4 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, int nCols,
   return;
 }
 
-#include "../common/mpidriver.cpp"
+#include "mpi-vert-driver.cpp"
