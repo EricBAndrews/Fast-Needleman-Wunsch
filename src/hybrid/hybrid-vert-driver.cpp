@@ -9,13 +9,11 @@
 //  this would allow us to use Isend...
 
 int main(int argc, char** argv) {
-  if (argc != 4) {
-    printf("error: incorrect number of arguments (expected 3, got %i)\n",
+  if (argc != 3) {
+    printf("error: incorrect number of arguments (expected 2, got %i)\n",
            argc - 1);
     return 1;
   }
-
-  int bufSize = atoi(argv[3]);
       
   MPI_Init(NULL, NULL);
   int nProc, rank;
@@ -43,9 +41,12 @@ int main(int argc, char** argv) {
   // get start time in ms since epoch
   long int wallStart = std::chrono::duration_cast<std::chrono::milliseconds>(
     std::chrono::system_clock::now().time_since_epoch()).count();
-  
+
+  // print start time
+  // printf("P%i | wallStart: %li\n", rank, wallStart);
+
   // run the algorithm
-  needlemanWunsch(s1, s2, nCols, rank, nProc, table, bufSize);
+  needlemanWunsch(s1, s2, nCols, rank, nProc, table);
 
   // get end time in ms since epoch
   long int wallEnd = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -73,8 +74,7 @@ int main(int argc, char** argv) {
     MPI_Recv(&recEnd, nProc-1, MPI_LONG, nProc-1, nProc-1,
              MPI_COMM_WORLD, NULL);
     
-    // printf("time: %li\n", recEnd - first);
-    printf("%li", recEnd - first);
+    printf("time: %li\n", recEnd - first);
   }
 
   // send time info to rank 0
@@ -88,11 +88,9 @@ int main(int argc, char** argv) {
   MPI_Barrier(MPI_COMM_WORLD);
 
   // display final score
-  // if (rank == nProc - 1) {
-  //   printf("final score: %i\n", table[size-1]);
-  // }
-
-  delete[] table;
+  if (rank == nProc - 1) {
+    printf("final score: %i\n", table[size-1]);
+  }
   
   MPI_Finalize();
   

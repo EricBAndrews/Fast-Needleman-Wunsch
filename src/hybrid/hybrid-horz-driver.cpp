@@ -2,20 +2,14 @@
 #include <iostream>
 
 // TODO
-// Try horizontal strips over vertical
-//  (tune omp to hande that better)
-//  can use memcpy for communication
-//  might not even need a dedicated buffer--can use the table itself
-//  this would allow us to use Isend...
+// tune openMP to handle horizontal better?
 
 int main(int argc, char** argv) {
-  if (argc != 4) {
-    printf("error: incorrect number of arguments (expected 3, got %i)\n",
+  if (argc != 3) {
+    printf("error: incorrect number of arguments (expected 2, got %i)\n",
            argc - 1);
     return 1;
   }
-
-  int bufSize = atoi(argv[3]);
       
   MPI_Init(NULL, NULL);
   int nProc, rank;
@@ -34,18 +28,22 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  long int nCols = ((s1.size + 1) / nProc) + (rank > 0);
-  if (rank == nProc - 1) { nCols += (s1.size + 1) % nProc; }
-  long int size = nCols * (long int)(s2.size + 1);
+  long int nRows = ((s2.size + 1) / nProc) + (rank > 0);
+  if (rank == nProc - 1) { nRows += (s2.size + 1) % nProc; }
+  
+  long int size = nRows * (long int)(s1.size + 1);
   int* table = new int[size];
   for (long int i = 0; i < size; i += 1024) { table[i] = 0; }
 
   // get start time in ms since epoch
   long int wallStart = std::chrono::duration_cast<std::chrono::milliseconds>(
     std::chrono::system_clock::now().time_since_epoch()).count();
-  
+
+  // print start time
+  // printf("P%i | wallStart: %li\n", rank, wallStart);
+
   // run the algorithm
-  needlemanWunsch(s1, s2, nCols, rank, nProc, table, bufSize);
+  needlemanWunsch(s1, s2, nRows, rank, nProc, table);
 
   // get end time in ms since epoch
   long int wallEnd = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -73,8 +71,7 @@ int main(int argc, char** argv) {
     MPI_Recv(&recEnd, nProc-1, MPI_LONG, nProc-1, nProc-1,
              MPI_COMM_WORLD, NULL);
     
-    // printf("time: %li\n", recEnd - first);
-    printf("%li", recEnd - first);
+    printf("time: %li\n", recEnd - first);
   }
 
   // send time info to rank 0
@@ -88,11 +85,9 @@ int main(int argc, char** argv) {
   MPI_Barrier(MPI_COMM_WORLD);
 
   // display final score
-  // if (rank == nProc - 1) {
-  //   printf("final score: %i\n", table[size-1]);
-  // }
-
-  delete[] table;
+  if (rank == nProc - 1) {
+    printf("final score: %i\n", table[size-1]);
+  }
   
   MPI_Finalize();
   

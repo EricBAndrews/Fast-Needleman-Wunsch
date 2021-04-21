@@ -1,7 +1,8 @@
 CC = mpic++
 COMMON = ../common
+OMP = -I /usr/local/incldue -L /usr/local/lib -fopenmp
 OPT = -O3
-FLAGS = -Wall $(OPT) -I $(COMMON)
+FLAGS = -Wall $(OPT) -I $(COMMON) $(OMP)
 
 all: mpi-vert.e mpi-horz.e
 
