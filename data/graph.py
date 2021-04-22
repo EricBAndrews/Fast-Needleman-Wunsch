@@ -34,7 +34,7 @@ yLabel = args.y
 fin = args.f
 print('parsing results from ' + fin.readline(), end='')
 xVals = fin.readline().split()[1:]
-xVals = [int(a[:-2]) for a in xVals]
+xVals = [int(a) for a in xVals]
 
 yVals = {}
 for line in fin:

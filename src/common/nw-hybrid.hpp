@@ -17,6 +17,8 @@
 #define SHIFTBITS 31
 #define LONGBITS 63
 
-#define COMMBUF_SIZE 1280
+#define COMMBUF_SIZE 1024
+#define N 64
+#define M 128
 
 #endif
