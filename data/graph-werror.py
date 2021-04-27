@@ -25,7 +25,7 @@ parser.add_argument('--speedup',
 args = parser.parse_args() 
 
 # parameters
-title = args.t
+plotTitle = args.t
 # dataFileName = datadir + '/' + dataFileNameShort + '.tsv'
 xLabel = args.x
 yLabel = args.y
@@ -37,9 +37,29 @@ xVals = fin.readline().split()[1:]
 xVals = [int(a[:-2]) for a in xVals]
 
 yVals = {}
+# yErrLarge = {}
+# yErrSmall = {}
+yErr = {}
 for line in fin:
-    splitLine = line.split()
-    yVals[splitLine[0]] = [int(a) for a in splitLine[1:]]
+    title = line.split('\t')[0]
+    splitLine = [[int(b) for b in a.split()] for a in line.split('\t')[1:-1]]
+    # print(splitLine)
+    vals = []
+    err = [[], []]
+    for a in splitLine:
+        avg = sum(a) / len(a)
+        vals.append(avg)
+        err[0].append(abs(min(a) - avg))
+        err[1].append(max(a) - avg)
+        print('avg:', avg, 'neg', min(a) - avg, 'pos', max(a) - avg)
+    yVals[title] = vals
+    yErr[title] = err
+    # yVals[title] = [sum(a) / len(a) for a in splitLine]
+    # yErr[title] = [[max(a) for a in splitLine], [min(a) for a in splitLine]]
+    # yErrLarge[title] = [max(a) for a in splitLine]
+    # yErrSmall[title] = [min(a) for a in splitLine]
+
+print(yErr)
 
 # adjust to do speedup
 if (args.speedup):
@@ -49,11 +69,18 @@ if (args.speedup):
                 yVals[v][i] = yVals['serial'][i] / yVals[v][i]
     yVals['serial'] = [1 for i in yVals['serial']]
 
-for v in yVals:
-    plt.plot(xVals, yVals[v], label=v)
+    for v in yVals:
+        plt.plot(xVals, yVals[v], label=v)
+
+else:
+    for v in yVals:
+        plt.errorbar(xVals, yVals[v],
+                     yerr = yErr[title],
+                     capsize = 3,
+                     label = v)
 
 plt.legend()
-plt.title(title)
+plt.title(plotTitle)
 plt.xlabel(xLabel)
 plt.ylabel(yLabel)
 

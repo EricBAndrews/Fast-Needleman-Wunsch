@@ -1,0 +1,6 @@
+benchmarking serial, omp, mpi, hybrid
+program	2gb	4gb	6gb	
+serial	1379 1380 1379 	2746 2785 2747 	4164 4754 4165 	
+omp	95 92 108 	187 185 185 	272 276 277 	
+mpi	191 189 202 	268 270 273 	374 395 390 	
+hybrid	97 96 97 	188 190 185 	289 287 287 	

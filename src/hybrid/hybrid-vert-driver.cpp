@@ -34,6 +34,7 @@ int main(int argc, char** argv) {
 
   long int nCols = ((s1.size + 1) / nProc) + (rank > 0);
   if (rank == nProc - 1) { nCols += (s1.size + 1) % nProc; }
+  
   long int size = nCols * (long int)(s2.size + 1);
   int* table = new int[size];
   for (long int i = 0; i < size; i += 1024) { table[i] = 0; }
