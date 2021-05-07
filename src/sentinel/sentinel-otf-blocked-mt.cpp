@@ -1,9 +1,13 @@
 #include "needleman-wunsch.hpp"
 
 // rows, columns per block
-// best for 4k blocks
-#define N 128
-#define M 64
+// best on my local machine
+// #define N 128
+// #define M 64
+
+// best on research server
+#define N 96
+#define M 400
 
 // takes in the array to be filled--don't care about the allocation time
 void needlemanWunsch(dnaArray s1, dnaArray s2, int* t) {

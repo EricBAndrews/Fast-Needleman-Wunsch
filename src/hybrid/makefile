@@ -4,14 +4,13 @@ OMP = -L /usr/local/lib -fopenmp
 OPT = -O3
 FLAGS = -Wall $(OPT) -I $(COMMON)
 
-# all: hybrid-vert.e hybrid-horz.e
-all: hybrid-vert.e
+all: hybrid-vert.e hybrid-horz.e
 
 hybrid-vert.e: helper.o hybrid-vert.cpp $(COMMON)/nw-hybrid.hpp hybrid-vert-driver.cpp
 	$(CC) $(FLAGS) $(OMP) -o hybrid-vert.e hybrid-vert.cpp helper.o
 
 hybrid-horz.e: helper.o hybrid-horz.cpp $(COMMON)/nw-hybrid.hpp hybrid-horz-driver.cpp
-	$(CC) $(FLAGS) -o hybrid-horz.e hybrid-horz.cpp helper.o
+	$(CC) $(FLAGS) $(OMP) -o hybrid-horz.e hybrid-horz.cpp helper.o
 
 hybrid-horz-tune.e: helper.o hybrid-horz-tune.cpp $(COMMON)/nw-hybrid.hpp hybrid-horz-tune-driver.cpp
 	$(CC) $(FLAGS) -o hybrid-horz-tune.e hybrid-horz-tune.cpp helper.o

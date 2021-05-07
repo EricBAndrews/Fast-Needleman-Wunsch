@@ -11,9 +11,11 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, long int nCols,
   long int nRows = s2.size + 1;
   
   // buffers for sending, receiving
-  int* sendBuf = new int[COMMBUF_SIZE];
-  int* recvBuf = new int[COMMBUF_SIZE];
-
+  // int* sendBuf = new int[COMMBUF_SIZE];
+  // int* recvBuf = new int[COMMBUF_SIZE];
+  int* sendBuf;
+  int* recvBuf;
+  
   // first index of s1 in this table (last index of rank-1's work)
   long int start = ((s1.size + 1) / nProc) * rank - (rank > 0);
 
@@ -23,19 +25,26 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, long int nCols,
   {
     int a, b, c, m; // temps for calculation
     int* depLocation; // above dependency
-    long int iMax;
+    long int iMax = 0; // set to shut up compiler warning
 
     // threading info
     long int tnum = omp_get_thread_num();
     long int nThreads = omp_get_num_threads();
+    int commSize = COMMBUF_FACTOR * N * nThreads;
 
     // populate first row
+    #pragma omp single nowait
+    {
+      sendBuf = new int[commSize];
+    }
+    #pragma omp single nowait
+    {
+      recvBuf = new int[commSize];
+    }
 #pragma omp single
     {
       for (long int i = 0; i < nCols; ++i) { t[i] = (i + start) * GAP; }
     }
-
-// #pragma omp barrier
     
     // RANK 0
     // never receives; only sends to rank 1
@@ -51,18 +60,16 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, long int nCols,
 
       // printf("table set up\n");
 
-      // this loop divides the work into blocks of height COMMBUF_SIZE
-      for (long int h = 1; h < nRows; h += COMMBUF_SIZE) {
+      // this loop divides the work into blocks of height commSize
+      for (long int h = 1; h < nRows; h += commSize) {
         // using OMP, fill this block of the table
-        // largest value of y allowed--avoid running over table
-        long int yMax = (h + COMMBUF_SIZE < nRows) ? h + COMMBUF_SIZE : nRows;
-
         // this loop divides the MPI block into smaller OMP blocks
-        // y loops through blocks of height N
+        // long int yMax = (h + commSize < nRows) ? h + commSize : nRows;
+        long int yMax = nRows + ((((h+commSize) - nRows) >> LONGBITS) & ((h+commSize) - nRows));
         for (long int y = h + (tnum * N); y < yMax; y += (N * nThreads)) {
           // bound i by min(yMax, y + N)
-          // long int iMax = (y+N)+(((yMax-(y+N))>>LONGBITS)&(yMax-(y+N)));
-          iMax = (yMax < y + N) ? yMax : y + N;
+          iMax = yMax + ((((y+N) - yMax) >> LONGBITS) & ((y+N) - yMax));
+          // iMax = (yMax < y + N) ? yMax : y + N;
 
           // fill last row in block
           std::fill(&t[(nCols * (iMax - 1)) + 2], &t[(nCols * iMax) - 1], INT_MIN);
@@ -70,8 +77,8 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, long int nCols,
           // x loops through blocks of width M
           for (long int x = 1; x < nCols; x += M) {
             // bound j by min(nCols, x + M)
-            // long int jMax = (x+M)+(((nCols-(x+M))>>LONGBITS)&(nCols-(x+M)));
-            long int jMax = (nCols < x + M) ? nCols : x + M;
+            // long int jMax = (nCols < x + M) ? nCols : x + M;
+            long int jMax = nCols + ((((x+M) - nCols) >> LONGBITS) & ((x+M) - nCols));
 
             // for first row of block, wait on data dependencies
             long int i = y;
@@ -98,7 +105,7 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, long int nCols,
             // fill the rest
             for (long int i = y + 1; i < iMax; ++i) {
               for (long int j = x; j < jMax; ++j) {
-                m = -(s1.dna[start+j-1] == s2.dna[i-1]);
+                m = -(s1.dna[j-1] == s2.dna[i-1]);
                 a = t[((i-1) * nCols) + j-1] + ((m & MATCH) | (~m & MISMATCH));
                 b = t[((i-1) * nCols) + j] + GAP;
                 c = t[(i * nCols) + j-1] + GAP;
@@ -114,6 +121,7 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, long int nCols,
           for (long int i = h; i < iMax; ++i) { sendBuf[i-h] = t[(i*nCols) + nCols - 1]; }
           MPI_Send(sendBuf, yMax - h, MPI_INT, 1, 0, MPI_COMM_WORLD);
         }
+#pragma omp barrier
       } // end h-loop
     } // end rank clause
 
@@ -126,14 +134,15 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, long int nCols,
         for (long int i = 1; i < nRows; ++i) { t[nCols*i+1] = INT_MIN; }
       }
       
-      for (long int h = 1; h < nRows; h += COMMBUF_SIZE) {
-        long int yMax = (h + COMMBUF_SIZE < nRows) ? h + COMMBUF_SIZE : nRows;
+      for (long int h = 1; h < nRows; h += commSize) {
+        //long int yMax = (h + commSize < nRows) ? h + commSize : nRows;
+        long int yMax = nRows + ((((h+commSize) - nRows) >> LONGBITS) & ((h+commSize) - nRows));
 
         // receive, copy into first column--do this only one one thread! cannot continue
         // until this is done.
 #pragma omp single
         {
-          MPI_Recv(recvBuf, COMMBUF_SIZE, MPI_INT, rank-1, rank-1,
+          MPI_Recv(recvBuf, commSize, MPI_INT, rank-1, rank-1,
                    MPI_COMM_WORLD, NULL);
           
           for (long int i = h; i < yMax; ++i) {
@@ -144,11 +153,13 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, long int nCols,
         // loop blocking structure is identical to rank 0 from hereon out; omitting
         // detailed comments for neatness.
         for (long int y = h + (tnum * N); y < yMax; y += (N * nThreads)) {
-          iMax = (yMax < y + N) ? yMax : y + N;
+          //iMax = (yMax < y + N) ? yMax : y + N;
+          iMax = yMax + ((((y+N) - yMax) >> LONGBITS) & ((y+N) - yMax));
           std::fill(&t[(nCols * (iMax - 1)) + 2], &t[(nCols * iMax) - 1], INT_MIN);
           
           for (long int x = 1; x < nCols; x += M) {
-            long int jMax = (nCols < x + M) ? nCols : x + M;
+            // long int jMax = (nCols < x + M) ? nCols : x + M;
+            long int jMax = nCols + ((((x+M) - nCols) >> LONGBITS) & ((x+M) - nCols));
             
             // first row
             long int i = y;
@@ -198,14 +209,14 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, long int nCols,
         for (long int i = 1; i < nRows; ++i) { t[nCols*i+1] = INT_MIN; }
       }
       
-      for (long int h = 1; h < nRows; h += COMMBUF_SIZE) {
-        long int yMax = (h + COMMBUF_SIZE < nRows) ? h + COMMBUF_SIZE : nRows;
+      for (long int h = 1; h < nRows; h += commSize) {
+        long int yMax = nRows + ((((h+commSize) - nRows) >> LONGBITS) & ((h+commSize) - nRows));
 
         // receive, copy into first column--do this only one one thread! cannot continue
         // until this is done.
 #pragma omp single
         {
-          MPI_Recv(recvBuf, COMMBUF_SIZE, MPI_INT, rank-1, rank-1,
+          MPI_Recv(recvBuf, commSize, MPI_INT, rank-1, rank-1,
                    MPI_COMM_WORLD, NULL);
           
           for (long int i = h; i < yMax; ++i) {
@@ -216,11 +227,12 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, long int nCols,
         // loop blocking structure is identical to rank 0 from hereon out; omitting
         // detailed comments for neatness.
         for (long int y = h + (tnum * N); y < yMax; y += (N * nThreads)) {
-          iMax = (yMax < y + N) ? yMax : y + N;
+          iMax = yMax + ((((y+N) - yMax) >> LONGBITS) & ((y+N) - yMax));
           std::fill(&t[(nCols * (iMax - 1)) + 2], &t[(nCols * iMax) - 1], INT_MIN);
           
           for (long int x = 1; x < nCols; x += M) {
-            long int jMax = (nCols < x + M) ? nCols : x + M;
+            // long int jMax = (nCols < x + M) ? nCols : x + M;
+            long int jMax = nCols + ((((x+M) - nCols) >> LONGBITS) & ((x+M) - nCols));
             
             // first row
             long int i = y;
@@ -263,6 +275,7 @@ void needlemanWunsch(dnaArray s1, dnaArray s2, long int nCols,
           for (long int i = h; i < iMax; ++i) { sendBuf[i-h] = t[(i*nCols) + nCols - 1]; }
           MPI_Send(sendBuf, yMax - h, MPI_INT, rank+1, rank, MPI_COMM_WORLD);
         }
+        #pragma omp barrier
       } // end h-loop
     } // end rank clause
   } // end parallel region

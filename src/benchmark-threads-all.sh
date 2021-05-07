@@ -1,17 +1,13 @@
 #!/bin/zsh
 
 # programs to benchmark
-progs=(sentinel-mt.e
-       sentinel-parfill-mt.e
-       sentinel-otf-mt.e
-       sentinel-nofill-mt.e
-       sentinel-otf-blocked-mt.e)
+progs=(sentinel/sentinel-parfill-mt.e
+       sentinel/sentinel-otf-mt.e
+       sentinel/sentinel-otf-blocked-mt.e)
 
 # names for table
-tags=(naive
-      parfill
+tags=(parfill
       otf
-      nofill
       otf-blocked)
 
 let "numProgs = ${#progs[@]}"

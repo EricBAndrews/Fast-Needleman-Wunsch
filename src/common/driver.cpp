@@ -32,7 +32,7 @@ int main(int argc, char** argv){
   int wallMsec = std::chrono::duration_cast<std::chrono::milliseconds>(wallDiff).count();
   std::cout << wallMsec;
 
-  std::cout << "\nScore: " << table[size-1] << std::endl;
+  // std::cout << "\nScore: " << table[size-1] << std::endl;
 
   delete table;
 

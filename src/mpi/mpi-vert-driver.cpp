@@ -74,7 +74,8 @@ int main(int argc, char** argv) {
     MPI_Recv(&recEnd, nProc-1, MPI_LONG, nProc-1, nProc-1,
              MPI_COMM_WORLD, NULL);
     
-    printf("time: %li\n", recEnd - first);
+    //printf("time: %li\n", recEnd - first);
+    printf("%li", recEnd - first);
   }
 
   // send time info to rank 0
@@ -88,9 +89,9 @@ int main(int argc, char** argv) {
   MPI_Barrier(MPI_COMM_WORLD);
 
   // display final score
-  if (rank == nProc - 1) {
-    printf("final score: %i\n", table[size-1]);
-  }
+  // if (rank == nProc - 1) {
+  //   printf("final score: %i\n", table[size-1]);
+  // }
   
   MPI_Finalize();
   

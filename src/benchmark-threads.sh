@@ -11,12 +11,12 @@
 
 # fast(er)
 let "nRuns = 3"
-let "minSize = 2"
-let "maxSize = 16"
+let "minSize = 32"
+let "maxSize = 32"
 let "sizeStep = 2"
 let "minThreads = 2"
-let "maxThreads = 8"
-let "threadStep = 2"
+let "maxThreads = 30"
+let "threadStep = 1"
 
 # testing
 # let "nRuns = 1"
@@ -26,6 +26,8 @@ let "threadStep = 2"
 # let "minThreads = 4"
 # let "maxThreads = 8"
 # let "threadStep = 4"
+
+export GOMP_CPU_AFFINITY="0-29:1"
 
 if [ $# -eq 0 ]
 then
@@ -71,7 +73,7 @@ do
     let "s = 0"
     for ((j = 0; j < nRuns; j++))
     do
-	let "a = $(./serial.e bdna-link/"$i"gb-1.bdna bdna-link/"$i"gb-2.bdna)"
+	let "a = $(serial/serial.e bdna-link/"$i"gb-1.bdna bdna-link/"$i"gb-2.bdna)"
 	let "s = s + a"
     done
     let "s = s / $nRuns"
@@ -101,3 +103,5 @@ do
     done
     echo >> threads.tsv 
 done
+
+unset GOMP_CPU_AFFINITY

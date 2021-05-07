@@ -1,17 +1,16 @@
 #!/bin/zsh
 
 let "minN = 16"
-let "maxN = 256"
+let "maxN = 512"
 let "minM = 16"
-let "maxM = 256"
+let "maxM = 512"
 let "blockStep = 16"
 
 let "minSize = 2"
-let "maxSize = 16"
+let "maxSize = 22"
 let "sizeStep = 2"
 
-
-export OMP_NUM_THREADS=4
+export OMP_NUM_THREADS=10
 
 for ((i = $minSize; i <= $maxSize; i += $sizeStep))
 do
@@ -38,8 +37,8 @@ do
 	do
 	    echo -n .
 	    # take best of two runs to deal with outlier runs
-	    let "run1 = $(./sentinel-ob-tune.e bdna-link/"$i"gb-1.bdna bdna-link/"$i"gb-2.bdna $N $M)"
-	    let "run2 = $(./sentinel-ob-tune.e bdna-link/"$i"gb-1.bdna bdna-link/"$i"gb-2.bdna $N $M)"
+	    let "run1 = $(sentinel/sentinel-cornersync.e bdna-link/"$i"gb-1.bdna bdna-link/"$i"gb-2.bdna $N $M)"
+	    let "run2 = $(sentinel/sentinel-cornersync.e bdna-link/"$i"gb-1.bdna bdna-link/"$i"gb-2.bdna $N $M)"
 	    if [[ $run1 < $run2 ]]
 	    then
 	       	echo -n $run1'\t'  >> blocktune"$i".tsv

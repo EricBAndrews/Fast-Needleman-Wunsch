@@ -2,40 +2,46 @@
 
 # benchmarking parameters
 # thorough
-# let "nRuns = 5"
-# let "minSize = 2"
-# let "maxSize = 16"
-# let "sizeStep = 2"
+let "nRuns = 5"
+let "minSize = 2"
+let "maxSize = 64"
+let "sizeStep = 2"
 
 # fast
-let "nRuns = 2"
-let "minSize = 4"
-let "maxSize = 16"
-let "sizeStep = 4"
+# let "nRuns = 2"
+# let "minSize = 4"
+# let "maxSize = 16"
+# let "sizeStep = 4"
 
 # programs to benchmark
-progs=(serial.e
-       sentinel-mt.e
-       sentinel-parfill-mt.e
-       sentinel-otf-mt.e
-       sentinel-nofill-mt.e
-       sentinel-otf-blocked-mt.e)
+# progs=(serial.e
+#        sentinel-mt.e
+#        sentinel-parfill-mt.e
+#        sentinel-otf-mt.e
+#        sentinel-nofill-mt.e
+#        sentinel-otf-blocked-mt.e)
+progs=(sentinel/sentinel-otf-blocked-mt.e
+       sentinel/sentinel-cornersync.e)
 
 # number of threads to run each program on
-threads=(1 # serial
-	 4 # sentinel
-	 4 # parfill
-	 4 # otf
-	 4 # nofill
-	 4) # otf blocked
+threads=(10
+	 10)
+# threads=(1 # serial
+# 	 4 # sentinel
+# 	 4 # parfill
+# 	 4 # otf
+# 	 4 # nofill
+# 	 4) # otf blocked
 
 # names for table
-tags=(serial
-      naive
-      parfill
-      otf
-      nofill
-      otf-blocked)
+tags=(otf-blocked
+      cornersync)
+# tags=(serial
+#       naive
+#       parfill
+#       otf
+#       nofill
+#       otf-blocked)
 
 let "numProgs = ${#progs[@]}"
 
