@@ -3,6 +3,8 @@ This project is focused on optimizing the Needleman-Wunsch and Smith-Waterman al
 
 ## Included Files
 
+The `clean` branch contains only the code that was found to yield good speedup; all other branches have various ideas that didn't work, plus a bunch of clutter like tuning scripts, benchmarking scripts, old data files, and so on.
+
 The `bdna` directory contains a number of sequences. They are randomly generated and do not correspond to any existing species, except possibly by chance. They are formatted to be reasonably space-efficient, storing one base per byte; gaps are represented by 0, and bases A, T, G, and C by 1, 2, 3, and 4, respectively. 
 
 The `src` directory contains implementations of various optimized Needleman-Wunsch algorithms. `driver.cpp`, `needleman-wunsch.hpp`, `helper.cpp`, and `helper.hpp` are all shared between implementations, with the notable exception that `idxArray2.cpp` uses `driver2.cpp`.
